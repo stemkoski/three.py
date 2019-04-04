@@ -9,6 +9,10 @@ This project was inspired by [Three.js](https://threejs.org/), and attempts to f
 
 Three.py was originally designed for educational purposes, and rendering efficiency and optimization will occasionally be sacrificed for simplicity and clarity.
 
+To see what the Three.py library is capable of, see the [list of examples](https://github.com/stemkoski/three.py/wiki/Examples) or watch the [sample projects video](https://www.youtube.com/watch?v=vs6LdP6pWKI).
+
+[![Three.py video](https://raw.githubusercontent.com/stemkoski/three.py/master/three.py/docs/youtube-preview.png)](https://www.youtube.com/watch?v=vs6LdP6pWKI)
+
 ### Usage ###
 
 Three.py uses the Python libraries [pygame](https://www.pygame.org/), [PyOpenGL](http://pyopengl.sourceforge.net/), and [NumPy](http://www.numpy.org/). 
