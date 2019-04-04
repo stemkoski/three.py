@@ -3,7 +3,7 @@ three.py
 
 #### Python 3D library ####
 
-The aim of this project is to create an easy to use 3D library for use with Python.
+The aim of this project is to create an easy to use 3D library for Python.
 
 This project was inspired by [Three.js](https://threejs.org/), and attempts to follow the effective and reliable class structure from that project whenever possible.
 
