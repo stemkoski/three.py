@@ -13,6 +13,8 @@ To see what the Three.py library is capable of, see the [list of examples](https
 
 [![Three.py video](https://raw.githubusercontent.com/stemkoski/three.py/master/three.py/docs/youtube-preview.png)](https://www.youtube.com/watch?v=vs6LdP6pWKI)
 
+This project uses the MIT license.
+
 ### Usage ###
 
 Three.py uses the Python libraries [pygame](https://www.pygame.org/), [PyOpenGL](http://pyopengl.sourceforge.net/), and [NumPy](http://www.numpy.org/). 
