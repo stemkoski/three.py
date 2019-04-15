@@ -15,6 +15,11 @@ class Tween(object):
         return minFloat + (maxFloat - minFloat) * percent
         
     @staticmethod
+    def lerpVec2(minVec, maxVec, percent):
+        return [ Tween.lerpFloat( minVec[0], maxVec[0], percent ),
+                 Tween.lerpFloat( minVec[1], maxVec[1], percent ) ]
+    
+    @staticmethod
     def lerpVec3(minVec, maxVec, percent):
         return [ Tween.lerpFloat( minVec[0], maxVec[0], percent ),
                  Tween.lerpFloat( minVec[1], maxVec[1], percent ),
@@ -45,6 +50,8 @@ class Tween(object):
         # return interpolated value, according to value type
         if self.valueType == "float":
             return Tween.lerpFloat(self.valueList[index-1], self.valueList[index], percent)
+        elif self.valueType == "vec2":
+            return Tween.lerpVec2(self.valueList[index-1], self.valueList[index], percent)
         elif self.valueType == "vec3":
             return Tween.lerpVec3(self.valueList[index-1], self.valueList[index], percent)
         else:
