@@ -4,11 +4,12 @@
 class Tween(object):
 
     # assume timeList is sorted in increasing order
-    def __init__(self, timeList=[0], valueType="float", valueList=[1]):
+    def __init__(self, timeList=[0], valueType="float", valueList=[1], loop=False):
         self.timeList  = timeList
         self.valueType = valueType
         self.valueList = valueList
         self.listSize  = len(timeList)
+        self.loop = loop
         
     @staticmethod
     def lerpFloat(minFloat, maxFloat, percent):
@@ -31,6 +32,9 @@ class Tween(object):
         
     def evaluate(self, time):
     
+        if self.loop:
+            time = time % self.timeList[self.listSize-1]
+            
         # if time is outside the range specified by timeList,
         #    return the first/last element of valueList, as appropriate
         if time < self.timeList[0]:
