@@ -10,8 +10,8 @@ from mathutils import MatrixFactory
 class Curve(object):
 
     # divisions = number of line segments. len(points) = divisions+1.
-    def __init__(self, curveFunction, tMin=0, tMax=1, divisions=4, arcLengthDivisions=256):
-        self.f = curveFunction
+    def __init__(self, function, tMin=0, tMax=1, divisions=4, arcLengthDivisions=256):
+        self.f = function
         self.tMin = tMin
         self.tMax = tMax
         self.divisions = divisions
@@ -20,14 +20,9 @@ class Curve(object):
         self.arcLengthDivisions = arcLengthDivisions
         # list of length of curve from tMin to t
         # approximate using # of points from arcLengthDivisions
-        # TODO: clean this up
         self.arcLengths = None
         self.totalArcLength = None
         self.calculateArcLengths()
-
-        # for dashed lines:
-        
-        # normalize for hue shading
         
     def calculateArcLengths(self):
         # note: points stored as numpy arrays for simpler calculation syntax
@@ -75,6 +70,7 @@ class Curve(object):
         return self.getPointAt(t)
         
     # calculates a list of equally spaced points along the curve
+    # size of list specified by divisions parameter in constructor
     def getPoints(self):
         points = []
         deltaU = 1 / (self.divisions - 1)
@@ -168,12 +164,3 @@ class Curve(object):
         vec.pop(3)              # convert vec4 back to vec3
         return vec
         
-    # TODO: getLengths (of intervals), getLengthAt (requires all lengths & interpolation on correct segment...
-    
-    """
-    getLengths(divisions) (cumulative segment lengths at each point)  [0, 0.1, 0.35, 0.4, 0.8, 1.2, 1.9]
-    getTotalLength(tRes) = arcLength approximation, last value of getLengths' array
-    use these to get parameterization by arc length? nice/accurate tex coords?
-    
-    
-    """
