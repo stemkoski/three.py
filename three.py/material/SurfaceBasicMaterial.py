@@ -51,11 +51,16 @@ class SurfaceBasicMaterial(Material):
         
         uniform bool useLight;
         
+        // uniform bool receiveShadow;
+        
         struct Light
         {
             bool isAmbient;
             bool isDirectional;
             bool isPoint;
+            // bool castShadow;
+            // sampler2D shadowMap;
+            // float shadowStrength;
             
             // used by all lights
             float strength;
@@ -124,6 +129,13 @@ class SurfaceBasicMaterial(Material):
                 baseColor *= vec4( totalLight, 1 );
             }
 
+            // if ( receiveShadow )
+            // for each light 
+               // if isDirectional and castShadow
+               //  calculate distances, determine whether fragment in shadow
+               //  if so:
+               //      baseColor *= vec4( shadowStrength,shadowStrength,shadowStrength, 1 )
+            
             gl_FragColor = baseColor;
             
             if (gl_FragColor.a < alphaTest)

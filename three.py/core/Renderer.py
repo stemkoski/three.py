@@ -4,7 +4,7 @@ from lights import *
 
 class Renderer(object):
 
-    def __init__(self):
+    def __init__(self, viewWidth=512, viewHeight=512, clearColor=[0.75,0.75,0.75]):
 
         glEnable(GL_DEPTH_TEST)
 
@@ -26,9 +26,11 @@ class Renderer(object):
         glEnable( GL_POINT_SPRITE )
 
         # set default screen dimensions
-        self.setViewport(0,0, 512,512)
+        self.setViewport(0,0, viewWidth,viewHeight)
 
-        self.setClearColor(0.75,0.75,0.75, 1.0)
+        self.setClearColor(clearColor[0], clearColor[1], clearColor[2], 1.0)
+        
+        self.shadowMapEnabled = False
         
     # define the location/size of the rendered output in the window
     def setViewport(self, left=0, bottom=0, width=512, height=512):
@@ -49,6 +51,18 @@ class Renderer(object):
     
     def render(self, scene, camera, renderTarget=None, clearColor=True, clearDepth=True):
 
+        # shadow rendering pass
+        if self.shadowMapEnabled:
+            # get meshList of objects in scene with castShadow == True
+            # activate shadowShader from light
+            # set orthogonal projection and view matrix from position/direction data
+            # get lightList of DirectionalLights with castShadow == True
+            # render objects in meshList from light's shadowCamera onto light's shadowTexture
+            
+        
+        
+        # standard rendering pass
+        
         # activate render target
         if (renderTarget == None):
             # set render target to window
@@ -101,7 +115,7 @@ class Renderer(object):
                 direction = light.direction # apply rotation transform!
                 glUniform3f( glGetUniformLocation(ID, lightName+".direction"), direction[0], direction[1], direction[2] )
                 
-
+                # TODO: if castShadow, update corresponding uniforms.
                 lightIndex += 1
                 
             # update model matrix, other uniforms, etc.

@@ -18,6 +18,7 @@ class Mesh(Object3D):
             
         shaderProgramID = self.material.shaderProgramID
         
+        # TODO: remove because already set in renderer?
         glUseProgram( shaderProgramID )
 
         # set up attribute pointers
@@ -63,6 +64,7 @@ class Mesh(Object3D):
         glUniformMatrix4fv(modelMatrixVarID, 1, GL_TRUE, self.getWorldMatrix() )
                 
         # update uniform material data
+        # TODO: adjust textureNumber to take into account shadow maps previously generated?
         textureNumber = 0         
         for name, data in self.material.uniformData.items():
 

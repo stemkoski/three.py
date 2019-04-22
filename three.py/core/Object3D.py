@@ -11,6 +11,8 @@ class Object3D(object):
         self.parent = None
         self.children = []
         self.name = ""
+        self.castShadow = False
+        self.receiveShadow = False
     
     def add(self, child):
         self.children.append(child)
