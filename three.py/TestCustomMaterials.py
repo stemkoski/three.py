@@ -11,7 +11,7 @@ class TestCustomMaterials(Base):
     
     def initialize(self):
 
-        self.setWindowTitle('OBJ Model Loader')
+        self.setWindowTitle('Custom Materials')
         self.setWindowSize(800,800)
         
         self.renderer = Renderer()
@@ -24,8 +24,7 @@ class TestCustomMaterials(Base):
         self.camera.transform.setPosition(0, 3, 7)
         self.camera.transform.lookAt( 0, 0, 0 )
 
-
-        #initialize shaders
+        # initialize shaders
         vsCode = """
         attribute vec3 vertexPosition;
         attribute vec2 vertexUV;
@@ -48,9 +47,9 @@ class TestCustomMaterials(Base):
         varying vec3 position;
         uniform float width;
         
-        //credit to Laur(link: https://www.laurivan.com/rgb-to-hsv-to-rgb-for-shaders/)
-        //for the conversion functions
-        //functions for conversion from rgb to hsv and back
+        // credit to Laur(link: https://www.laurivan.com/rgb-to-hsv-to-rgb-for-shaders/)
+        // for the conversion functions
+        // functions for conversion from rgb to hsv and back
         vec3 rgb2hsv(vec3 c)
         {
             vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
@@ -79,42 +78,31 @@ class TestCustomMaterials(Base):
         }
         """
 
-        #setup the uniforms
-        rainbowUniforms = [["float","width",2.5]]
+        # setup the uniforms
+        uniforms = [["float","width",2.5]]
 
-        #make a custom material with the above values
-        self.customMaterial = Material(vsCode,fsCode,rainbowUniforms)
-
-        #Cube to show of the new material
-        self.cubeGeo = BoxGeometry()
-
-        self.cubeMesh = Mesh(self.cubeGeo,self.customMaterial)
-        self.scene.add(self.cubeMesh)
+        # create a cube to show off the custom material
+        self.cube = Mesh( BoxGeometry(), Material(vsCode,fsCode,uniforms) )
+        self.scene.add(self.cube)
 
         self.time = 0
 
         self.translationFunction = lambda t: [sin(t*2),sin(t),0]
-
-        self.cubePosition = self.translationFunction(self.time)
-        self.cubeMesh.transform.setPosition(self.cubePosition[0],self.cubePosition[1],
-                                            self.cubePosition[2],Matrix.GLOBAL)
         
         
     def update(self):
+    
         self.time += 1/60
 
-        self.cubePosition = self.translationFunction(self.time)
-        self.cubeMesh.transform.setPosition(self.cubePosition[0],self.cubePosition[1],
-                                            self.cubePosition[2],Matrix.GLOBAL)
-        self.cubeMesh.transform.rotateX(0.02,Matrix.LOCAL)
-        self.cubeMesh.transform.rotateY(0.02,Matrix.LOCAL)
+        position = self.translationFunction(self.time)
+        self.cube.transform.setPosition(position[0], position[1], position[2], Matrix.GLOBAL)
+        self.cube.transform.rotateX(0.02,Matrix.LOCAL)
+        self.cube.transform.rotateY(0.02,Matrix.LOCAL)
         
         if self.input.resize():
             size = self.input.getWindowSize()
             self.camera.setAspectRatio( size["width"]/size["height"] )
             self.renderer.setViewportSize(size["width"], size["height"])
-
-        
         
         self.renderer.render(self.scene, self.camera)
                     
