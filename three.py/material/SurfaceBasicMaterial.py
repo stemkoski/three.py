@@ -15,19 +15,35 @@ class SurfaceBasicMaterial(Material):
         
         out vec3 position;
         out vec2 UV;
-        out vec3 normal;
+        out vec3 normal; 
         out vec3 vColor;
         
         uniform mat4 projectionMatrix;
         uniform mat4 viewMatrix;
-        uniform mat4 modelMatrix;      
+        uniform mat4 modelMatrix;
+        
+        uniform bool receiveShadow;
+        
+        // assume that at most one light casts shadows
+        //   and its values have been passed in here
+        uniform mat4 shadowLightProjectionMatrix;
+        uniform mat4 shadowLightViewMatrix;
+        out vec4 positionFromShadowLight;
         
         void main()
         {
+            // out values being sent to fragment shader
             position = vec3( modelMatrix * vec4(vertexPosition, 1) );
             UV = vertexUV;
             normal = normalize(mat3(modelMatrix) * vertexNormal); // normalize in case of model scaling
             vColor = vertexColor;
+            
+            if (receiveShadow)
+            {
+                // multiply by modelMatrix works for directly overhead light
+                positionFromShadowLight = shadowLightProjectionMatrix * shadowLightViewMatrix * modelMatrix * vec4(vertexPosition, 1);
+            }
+            
             gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1);
         }
         """
@@ -51,16 +67,11 @@ class SurfaceBasicMaterial(Material):
         
         uniform bool useLight;
         
-        // uniform bool receiveShadow;
-        
         struct Light
         {
             bool isAmbient;
             bool isDirectional;
             bool isPoint;
-            // bool castShadow;
-            // sampler2D shadowMap;
-            // float shadowStrength;
             
             // used by all lights
             float strength;
@@ -71,7 +82,6 @@ class SurfaceBasicMaterial(Material):
             
             // used by point light
             vec3 position;
-            
         };
 
         uniform Light light0;
@@ -109,6 +119,15 @@ class SurfaceBasicMaterial(Material):
             
         }
         
+        // assume that at most one light casts shadows
+        //   and its values have been passed in here
+        uniform bool receiveShadow;
+        in vec4 positionFromShadowLight;
+        uniform sampler2D shadowMap;
+        uniform float shadowStrength;
+        uniform float shadowBias;
+        uniform vec3 shadowLightDirection;
+        
         void main()
         {
             vec4 baseColor = vec4(color, alpha);
@@ -129,12 +148,22 @@ class SurfaceBasicMaterial(Material):
                 baseColor *= vec4( totalLight, 1 );
             }
 
-            // if ( receiveShadow )
-            // for each light 
-               // if isDirectional and castShadow
-               //  calculate distances, determine whether fragment in shadow
-               //  if so:
-               //      baseColor *= vec4( shadowStrength,shadowStrength,shadowStrength, 1 )
+            if ( receiveShadow )
+            {
+                // do not apply shadow if surface is facing away from directional light
+                vec3 unitNormal = normalize(normal);
+                float cosAngle = dot(unitNormal, shadowLightDirection);
+                bool facingLight = (cosAngle < -0.05);
+                
+                vec3 shadowCoord = ( positionFromShadowLight.xyz / positionFromShadowLight.w ) / 2.0 + 0.5;
+                float closestDistanceToLight = texture2D(shadowMap, shadowCoord.xy).r;
+                float fragmentDistanceToLight = shadowCoord.z;
+                // is this fragment in shadow?
+                if (facingLight && fragmentDistanceToLight > closestDistanceToLight + shadowBias)
+                    baseColor *= vec4( shadowStrength, shadowStrength, shadowStrength, 1.0 );
+                //baseColor = vec4(0,0,1,1);
+                //baseColor = vec4(closestDistanceToLight, 0, 0, 1);
+            }
             
             gl_FragColor = baseColor;
             

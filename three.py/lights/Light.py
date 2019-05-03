@@ -3,7 +3,7 @@ from core import Object3D
 class Light(Object3D):
 
     # constructor takes no arguments; set default values in code. extensions have parameterized constructors...
-    def __init__(self):
+    def __init__(self, position=[0,0,0], color=[1,1,1], strength=1):
     
         super().__init__()
         
@@ -13,13 +13,15 @@ class Light(Object3D):
         self.isPoint       = 0
         
         # default light color
-        self.color    = [1,1,1]
+        self.color    = color
         # control relative intensity of lights
-        self.strength = 1
+        self.strength = strength
         
         # store light position in matrix to simplify light movement (PointLight)
         # and to adjust position of helper meshes (DirectionalLightHelper, PointLightHelper)
-        self.transform.setPosition(0,0,0)
-        # direction of light is constant for DirectionLight; needs to be normalized
-        self.direction = [0,-1,0]
+        # also used in shadow calculations for directional light
+        self.transform.setPosition( position[0], position[1], position[2] )
         
+        
+    def enableShadows(self, strength=0.5):
+        pass

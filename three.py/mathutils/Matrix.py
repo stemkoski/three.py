@@ -66,7 +66,11 @@ class Matrix(object):
         return np.array( [ self.matrix[0][0:3], 
                               self.matrix[1][0:3], 
                               self.matrix[2][0:3] ] )
-                              
+    
+    # copies the upper 3x3 submatrix of M (which contains rotation data) into this matrix.
+    def setRotationSubmatrix(self, M):
+        self.matrix[0:3,0:3] = M[0:3,0:3]
+        
     # rotate matrix to look at target=[x,y,z]
     def lookAt(self, x, y, z):
         self.matrix = MatrixFactory.makeLookAt( self.getPosition(), [x,y,z], [0,1,0] )

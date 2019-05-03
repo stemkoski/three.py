@@ -1,8 +1,8 @@
 from OpenGL.GL import *
 
-class RenderTarget(object):
+class RenderTarget(object): 
 
-    def __init__(self, width, height):
+    def __init__(self, width=512, height=512):
 
         self.width = width
         self.height = height
@@ -17,7 +17,7 @@ class RenderTarget(object):
         
         # create a texture to render to
         self.textureID = glGenTextures(1)
-                     
+        print("created texture " , self.textureID )
         # "Bind" the newly created texture : all future texture functions will modify this texture
         glBindTexture(GL_TEXTURE_2D, self.textureID)
 

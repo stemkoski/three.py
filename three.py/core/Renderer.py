@@ -28,7 +28,7 @@ class Renderer(object):
         # set default screen dimensions
         self.setViewport(0,0, viewWidth,viewHeight)
 
-        self.setClearColor(clearColor[0], clearColor[1], clearColor[2], 1.0)
+        self.clearColor = clearColor
         
         self.shadowMapEnabled = False
         
@@ -45,23 +45,49 @@ class Renderer(object):
         self.screenHeight = height
 
     # color(rgba) used for clearing the screen background
-    def setClearColor(self, red, green, blue, alpha=1):
-        glClearColor(red, green, blue, alpha)
-    
+    def setClearColor(self, red, green, blue):
+        self.clearColor = [red,green,blue]
     
     def render(self, scene, camera, renderTarget=None, clearColor=True, clearDepth=True):
 
         # shadow rendering pass
         if self.shadowMapEnabled:
-            # get meshList of objects in scene with castShadow == True
-            # activate shadowShader from light
-            # set orthogonal projection and view matrix from position/direction data
-            # get lightList of DirectionalLights with castShadow == True
-            # render objects in meshList from light's shadowCamera onto light's shadowTexture
             
-        
-        
+            # render objects in meshList from light's shadowCamera onto light's shadowMap
+            
+            # note: at present, only one shadow casting directional light is supported
+            shadowCastLightList = scene.getObjectsByFilter( lambda x : isinstance(x, Light) and x.castShadow )
+            
+            # only store depth data for objects which are set to cast a shadow on other objects
+            shadowCastMeshList = scene.getObjectsByFilter( lambda x : isinstance(x, Mesh) and x.castShadow )
+
+            for light in shadowCastLightList:
+                
+                # set render target properties
+                glBindFramebuffer(GL_FRAMEBUFFER, light.shadowRenderTarget.framebufferID)
+                glViewport(0,0, light.shadowRenderTarget.width, light.shadowRenderTarget.height)
+            
+                glClearColor(1,0,1,1)
+                glClear(GL_COLOR_BUFFER_BIT)
+                glClear(GL_DEPTH_BUFFER_BIT)
+            
+                # activate shader
+                shadowProgramID = light.shadowMaterial.shaderProgramID
+                glUseProgram( shadowProgramID )
+                
+                glUniformMatrix4fv( glGetUniformLocation(shadowProgramID, "projectionMatrix"), 
+                    1, GL_TRUE, light.shadowCamera.getProjectionMatrix() )
+                
+                glUniformMatrix4fv(glGetUniformLocation(shadowProgramID, "viewMatrix"), 
+                    1, GL_TRUE, light.shadowCamera.getViewMatrix() )
+                
+                for mesh in shadowCastMeshList:
+                    mesh.render( shaderProgramID = shadowProgramID )
+                    
+                    
         # standard rendering pass
+        
+        glClearColor(self.clearColor[0], self.clearColor[1], self.clearColor[2], 1)
         
         # activate render target
         if (renderTarget == None):
@@ -71,7 +97,7 @@ class Renderer(object):
         else:
             # set render target properties
             glBindFramebuffer(GL_FRAMEBUFFER, renderTarget.framebufferID)
-            glViewport(self.left, self.bottom, renderTarget.width, renderTarget.height)
+            glViewport(0,0, renderTarget.width, renderTarget.height)
 
         # clear specified buffers
         if clearColor:
@@ -83,11 +109,11 @@ class Renderer(object):
         meshList = scene.getObjectsByFilter( lambda x : isinstance(x, Mesh) )
         lightList = scene.getObjectsByFilter( lambda x : isinstance(x, Light) )
         
-        for child in meshList: # scene.children:
+        for mesh in meshList: # scene.children:
 
             # activate correct shader program
-            ID = child.material.shaderProgramID
-            glUseProgram( ID )
+            ID = mesh.material.shaderProgramID
+            glUseProgram( ID ) 
            
             # update projection and view matrix uniforms
             projectionMatrixVarID = glGetUniformLocation(ID, "projectionMatrix")
@@ -97,11 +123,20 @@ class Renderer(object):
             viewMatrixVarID = glGetUniformLocation(ID, "viewMatrix")
             if viewMatrixVarID != -1:
                 glUniformMatrix4fv(viewMatrixVarID, 1, GL_TRUE, camera.getViewMatrix() )
-            
+
+            castShadowVarID = glGetUniformLocation(ID, "castShadow")
+            if castShadowVarID != -1 and mesh.castShadow:
+                glUniform1i( castShadowVarID, 1 )
+
+            receiveShadowVarID = glGetUniformLocation(ID, "receiveShadow")
+            if receiveShadowVarID != -1 and mesh.receiveShadow:
+                glUniform1i( receiveShadowVarID, 1 )
+                    
             # update light data
             lightCount = len(lightList)            
             glUniform1i( glGetUniformLocation(ID, "lightCount"), lightCount )
 
+            # update data for all the lights
             lightIndex = 0
             for light in lightList:
                 lightName = "light" + str(lightIndex)
@@ -110,15 +145,36 @@ class Renderer(object):
                 glUniform1i( glGetUniformLocation(ID, lightName+".isPoint"), light.isPoint )
                 glUniform3f( glGetUniformLocation(ID, lightName+".color"), light.color[0], light.color[1], light.color[2] )
                 glUniform1f( glGetUniformLocation(ID, lightName+".strength"), light.strength )
+                
                 position = light.transform.getPosition()
                 glUniform3f( glGetUniformLocation(ID, lightName+".position"), position[0], position[1], position[2] )
-                direction = light.direction # apply rotation transform!
-                glUniform3f( glGetUniformLocation(ID, lightName+".direction"), direction[0], direction[1], direction[2] )
                 
-                # TODO: if castShadow, update corresponding uniforms.
+                if light.isDirectional == 1:
+                    direction = light.getDirection()
+                    glUniform3f( glGetUniformLocation(ID, lightName+".direction"), direction[0], direction[1], direction[2] )
+                
+                # if castShadow, update variables containing shadow-related data
+                # note: at present, only one shadow casting directional light is supported
+                if light.castShadow:
+                    glUniformMatrix4fv( glGetUniformLocation(ID, "shadowLightProjectionMatrix"), 1, GL_TRUE, light.shadowCamera.getProjectionMatrix() )
+                    glUniformMatrix4fv( glGetUniformLocation(ID, "shadowLightViewMatrix"), 1, GL_TRUE, light.shadowCamera.getViewMatrix() )
+                    
+                    glUniform1f( glGetUniformLocation(ID, "shadowStrength"), light.shadowStrength )
+                    glUniform1f( glGetUniformLocation(ID, "shadowBias"), light.shadowBias )
+                    
+                    direction = light.getDirection()
+                    glUniform3f( glGetUniformLocation(ID, "shadowLightDirection"), direction[0], direction[1], direction[2] )
+                    
+                    # send shadow map texture data (slot 0)
+                    glUniform1i( glGetUniformLocation(ID, "shadowMap"), 0 )
+                    # activate texture slot
+                    glActiveTexture( GL_TEXTURE0 + 0 )
+                    # associate texture data reference to currently active texture slot
+                    glBindTexture( GL_TEXTURE_2D, light.shadowRenderTarget.textureID )
+                
                 lightIndex += 1
                 
             # update model matrix, other uniforms, etc.
             # and then call the drawArrays function
-            child.render()
+            mesh.render( shaderProgramID = mesh.material.shaderProgramID )
             
