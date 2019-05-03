@@ -7,7 +7,6 @@ from material import *
 from helpers import *
 from mathutils import *
 
-# TODO: adjust for non-square window sizes
 class TestMandlebrot(Base):
     
     def initialize(self):

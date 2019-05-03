@@ -1,6 +1,6 @@
 import numpy as np
 from OpenGL.GL import *
-
+ 
 from mathutils import Matrix
 from core import *
 
@@ -11,6 +11,8 @@ class Object3D(object):
         self.parent = None
         self.children = []
         self.name = ""
+        self.castShadow = False
+        self.receiveShadow = False
     
     def add(self, child):
         self.children.append(child)
@@ -41,6 +43,7 @@ class Object3D(object):
     def getObjectsByFilter(self, filterFunction=None):
         return list( filter( filterFunction, self.getDepthFirstList() ) )
         
+    # return first descendent with name parameter matching given value
     def getObjectByName(self, name):
         return self.getObjectsByFilter( lambda x : x.name == name )[0]
         

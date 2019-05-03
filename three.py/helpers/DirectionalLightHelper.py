@@ -14,13 +14,13 @@ class DirectionalLightHelper(Mesh):
         vertexColorData = []
         
         # position = np.array( directionalLight.transform.getPosition() )
-        direction = np.array( directionalLight.direction )
+        direction = directionalLight.DEFAULT # np.array( directionalLight.getDirection() )
         
         scale = 100
         vertexPositionData.append( [0,0,0] )
         vertexPositionData.append( [direction[0] * scale, direction[1] * scale, direction[2] * scale] ) 
         
-        n = np.cross( direction, [3.41, 1.26, 2.57] )
+        n = np.cross( direction, [0.001, 0.002, 1.000] )
         b = np.cross( direction, n )
         
         n = n / np.linalg.norm(n)
