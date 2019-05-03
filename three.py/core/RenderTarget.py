@@ -17,7 +17,7 @@ class RenderTarget(object):
         
         # create a texture to render to
         self.textureID = glGenTextures(1)
-        print("created texture " , self.textureID )
+        
         # "Bind" the newly created texture : all future texture functions will modify this texture
         glBindTexture(GL_TEXTURE_2D, self.textureID)
 
