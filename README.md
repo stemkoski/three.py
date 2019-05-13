@@ -13,24 +13,13 @@ To see what the Three.py library is capable of, see the [list of examples](https
 
 [![Three.py video](https://raw.githubusercontent.com/stemkoski/three.py/master/three.py/docs/youtube-preview.png)](https://www.youtube.com/watch?v=vs6LdP6pWKI)
 
-This project was initially developed by Lee Stemkoski and Michael Pascale
+This project was initially developed by Lee Stemkoski and Michael Pascale.
 
 This project uses the MIT license.
 
 ### Usage ###
 
-Three.py uses the Python libraries [pygame](https://www.pygame.org/), [PyOpenGL](http://pyopengl.sourceforge.net/), and [NumPy](http://www.numpy.org/). 
-
-A Pipenv Pipfile is provided with these dependencies.
-You can use it to setup a Virtualenv to run demos like this:
-
-```bash
-pip install pipenv
-pipenv install
-pipenv shell
-cd three.py
-python TestAnimatedDayNight.py
-```
+Three.py uses the Python libraries [PyGame](https://www.pygame.org/), [PyOpenGL](http://pyopengl.sourceforge.net/), and [NumPy](http://www.numpy.org/). 
 
 The following code creates a scene, a camera, ambient and directional lights, and adds a light blue cube to the scene. It animates (spins) the cube, and allows the user to move the camera with first-person controls.
 
@@ -81,4 +70,15 @@ class TestCube(Base):
                     
 # instantiate and run the program
 TestCube().run()
+```
+
+In case you are having difficulties related to versions of the dependencies (PyGame, PyOpenGL, NumPy), a [pipenv](https://docs.pipenv.org/en/latest/) pipfile is provided to set up a [virtualenv](https://virtualenv.pypa.io/en/latest/).
+It can be used as follows:
+
+```bash
+pip install pipenv
+pipenv install
+pipenv shell
+cd three.py
+python TestAnimatedDayNight.py
 ```
