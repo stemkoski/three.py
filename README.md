@@ -21,6 +21,17 @@ This project uses the MIT license.
 
 Three.py uses the Python libraries [pygame](https://www.pygame.org/), [PyOpenGL](http://pyopengl.sourceforge.net/), and [NumPy](http://www.numpy.org/). 
 
+A Pipenv Pipfile is provided with these dependencies.
+You can use it to setup a Virtualenv to run demos like this:
+
+```bash
+pip install pipenv
+pipenv install
+pipenv shell
+cd three.py
+python TestAnimatedDayNight.py
+```
+
 The following code creates a scene, a camera, ambient and directional lights, and adds a light blue cube to the scene. It animates (spins) the cube, and allows the user to move the camera with first-person controls.
 
 ```python

@@ -7,7 +7,10 @@ class OpenGLUtils(object):
 
     @staticmethod
     def initializeShader(shaderCode, shaderType):
-    
+        
+        extension = '#extension GL_ARB_shading_language_420pack : require\n'
+        shaderCode = '#version 130\n' + extension + shaderCode
+        
         # create empty shader object and return reference value
         shaderID = glCreateShader(shaderType)
         # stores the source code in the shader
