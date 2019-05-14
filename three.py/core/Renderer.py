@@ -30,6 +30,7 @@ class Renderer(object):
 
         self.clearColor = clearColor
         
+        self.fogEnabled = False
         self.shadowMapEnabled = False
         
     # define the location/size of the rendered output in the window
@@ -48,6 +49,10 @@ class Renderer(object):
     def setClearColor(self, red, green, blue):
         self.clearColor = [red,green,blue]
     
+    def setFog(self, fog):
+        self.fog = fog
+        self.fogEnabled = True
+        
     def render(self, scene, camera, renderTarget=None, clearColor=True, clearDepth=True):
 
         # shadow rendering pass
@@ -86,8 +91,10 @@ class Renderer(object):
                     
                     
         # standard rendering pass
-        
-        glClearColor(self.clearColor[0], self.clearColor[1], self.clearColor[2], 1)
+        if self.fogEnabled:
+            glClearColor(self.fog.color[0], self.fog.color[1], self.fog.color[2], 1)
+        else:
+            glClearColor(self.clearColor[0], self.clearColor[1], self.clearColor[2], 1)
         
         # activate render target
         if (renderTarget == None):
@@ -124,6 +131,12 @@ class Renderer(object):
             if viewMatrixVarID != -1:
                 glUniformMatrix4fv(viewMatrixVarID, 1, GL_TRUE, camera.getViewMatrix() )
 
+            if self.fogEnabled:
+                glUniform1i(glGetUniformLocation(ID, "useFog"), 1)
+                glUniform1f(glGetUniformLocation(ID, "fogStartDistance"), self.fog.startDistance)
+                glUniform1f(glGetUniformLocation(ID, "fogEndDistance"), self.fog.endDistance)
+                glUniform3f(glGetUniformLocation(ID, "fogColor"), self.fog.color[0], self.fog.color[1], self.fog.color[2])
+                
             castShadowVarID = glGetUniformLocation(ID, "castShadow")
             if castShadowVarID != -1 and mesh.castShadow:
                 glUniform1i( castShadowVarID, 1 )

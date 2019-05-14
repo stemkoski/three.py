@@ -22,6 +22,9 @@ class SurfaceBasicMaterial(Material):
         uniform mat4 viewMatrix;
         uniform mat4 modelMatrix;
         
+        uniform bool useFog;
+        out float cameraDistance; 
+        
         uniform bool receiveShadow;
         
         // assume that at most one light casts shadows
@@ -45,6 +48,11 @@ class SurfaceBasicMaterial(Material):
             }
             
             gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1);
+            
+            if (useFog)
+            {
+                cameraDistance = gl_Position.w;
+            }
         }
         """
 
@@ -119,6 +127,13 @@ class SurfaceBasicMaterial(Material):
             
         }
         
+        // parameters for fog calculations
+        uniform bool useFog;
+        uniform vec3 fogColor;
+        uniform float fogStartDistance;
+        uniform float fogEndDistance;
+        in float cameraDistance;
+        
         // assume that at most one light casts shadows
         //   and its values have been passed in here
         uniform bool receiveShadow;
@@ -148,6 +163,12 @@ class SurfaceBasicMaterial(Material):
                 baseColor *= vec4( totalLight, 1 );
             }
 
+            if ( useFog )
+            {
+                float fogFactor = clamp( (fogEndDistance - cameraDistance)/(fogEndDistance - fogStartDistance), 0.0, 1.0 );
+                baseColor = mix( vec4(fogColor,1.0), baseColor, fogFactor );
+            }
+            
             if ( receiveShadow )
             {
                 // do not apply shadow if surface is facing away from directional light
@@ -161,8 +182,6 @@ class SurfaceBasicMaterial(Material):
                 // is this fragment in shadow?
                 if (facingLight && fragmentDistanceToLight > closestDistanceToLight + shadowBias)
                     baseColor *= vec4( shadowStrength, shadowStrength, shadowStrength, 1.0 );
-                //baseColor = vec4(0,0,1,1);
-                //baseColor = vec4(closestDistanceToLight, 0, 0, 1);
             }
             
             gl_FragColor = baseColor;
