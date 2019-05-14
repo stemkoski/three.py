@@ -34,6 +34,11 @@ class TestShadows(Base):
         directionalLight.enableShadows()
         directionalLight.shadowRenderTarget = RenderTarget(1024,1024)
         directionalLight.shadowStrength = 0.5
+        # the tighter the fit on the shadow region,
+        #   the better the shadow resolution will be.
+        # adjust as necessary according to the contents of the scene
+        directionalLight.shadowCamera.setViewRegion(
+            left=-2, right=2, top=2, bottom=-2, near=10, far=0)
         self.scene.add( directionalLight )
         self.scene.add( DirectionalLightHelper(directionalLight) )
         self.scene.add( OrthographicCameraHelper(directionalLight.shadowCamera) )
