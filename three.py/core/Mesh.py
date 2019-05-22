@@ -18,9 +18,6 @@ class Mesh(Object3D):
 
         if not self.visible:
             return
-            
-        # TODO: remove because already set in renderer?
-        # glUseProgram( shaderProgramID )
 
         # set up attribute pointers
         for name, data in self.geometry.attributeData.items():
@@ -90,23 +87,18 @@ class Mesh(Object3D):
                     glActiveTexture( GL_TEXTURE0 + textureNumber )
                     # associate texture data reference to currently active texture "slot" (usually 0 through 15)
                     glBindTexture( GL_TEXTURE_2D, data["value"] )
+                    # when rendering normal textures, set coordinates to repeat
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
                     # increment textureNumber in case additional textures are in use
                     textureNumber += 1
                 
                 else:
                     raise Exception("Uniform " + data['name'] + " has unknown type " + data['type'])
 
-
         # render settings
         glPointSize(self.material.pointSize)
         glLineWidth(self.material.lineWidth)
-        
-        # when rendering shadow map texture, anything fragment out of bounds of the shadow camera frustum 
-        #   should fail the depth test (not be drawn in shadow), so set R component to 1.0
-        # TODO: this is causing artifacts at the edges of textures...
-        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, [1.0, 1.0, 1.0, 1.0]);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER)
         
         # enable meshes to cull front or back faces
         if self.material.renderFront and self.material.renderBack:

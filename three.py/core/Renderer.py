@@ -136,10 +136,6 @@ class Renderer(object):
                 glUniform1f(glGetUniformLocation(ID, "fogStartDistance"), self.fog.startDistance)
                 glUniform1f(glGetUniformLocation(ID, "fogEndDistance"), self.fog.endDistance)
                 glUniform3f(glGetUniformLocation(ID, "fogColor"), self.fog.color[0], self.fog.color[1], self.fog.color[2])
-                
-            castShadowVarID = glGetUniformLocation(ID, "castShadow")
-            if castShadowVarID != -1 and mesh.castShadow:
-                glUniform1i( castShadowVarID, 1 )
 
             receiveShadowVarID = glGetUniformLocation(ID, "receiveShadow")
             if receiveShadowVarID != -1 and mesh.receiveShadow:
@@ -184,7 +180,13 @@ class Renderer(object):
                     glActiveTexture( GL_TEXTURE0 + 0 )
                     # associate texture data reference to currently active texture slot
                     glBindTexture( GL_TEXTURE_2D, light.shadowRenderTarget.textureID )
-                
+                    
+                    # when rendering shadow map texture, anything fragment out of bounds of the shadow camera frustum 
+                    #   should fail the depth test (not be drawn in shadow), so set R component to 1.0
+                    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, [1.0, 1.0, 1.0, 1.0]);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER)
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER)
+            
                 lightIndex += 1
                 
             # update model matrix, other uniforms, etc.
