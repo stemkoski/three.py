@@ -3,7 +3,7 @@ from material import *
 
 class LineBasicMaterial(Material):
         
-    def __init__(self, color=[0,0,0], alpha=1, lineWidth=4, useVertexColors=False):
+    def __init__(self, color=[1,1,1], alpha=1, lineWidth=4, useVertexColors=False):
 
         # vertex shader code
         vsCode = """
@@ -90,7 +90,7 @@ class LineBasicMaterial(Material):
         # set default uniform values
         self.setUniform( "vec3", "color", color )
         self.setUniform( "float", "alpha", alpha )
-        
+        print("line basic material - use colors", useVertexColors)
         if useVertexColors:
             self.setUniform( "bool", "useVertexColors", 1 )
         else:
