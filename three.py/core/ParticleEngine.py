@@ -3,7 +3,7 @@ from geometry import *
 from material import *
 from mathutils import *
 
-from random import random, uniform
+import random as rand
 from math import sin, cos, pi, sqrt
 
 # =============================================================================
@@ -205,7 +205,7 @@ class ParticleEngine(Mesh):
         elif self.style == "sphere":
             ux,uy,uz = RandomUtils.randomUnitSphereVec3()
             cx,cy,cz = self.positionBase
-            r = uniform(0, self.positionSpread)
+            r = rand.uniform(0, self.positionSpread)
             particle.position = [cx+r*ux, cy+r*uy, cz+r*uz]               
             s = RandomUtils.randomFloat(self.velocityBase, self.velocitySpread)
             particle.velocity = [s*ux, s*uy, s*uz]
