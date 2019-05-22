@@ -52,7 +52,7 @@ class Geometry(object):
         vao = glGenVertexArrays(1)
         
         # DEBUG
-        print("Initializing VAO #", vao, "for geometry:", self.name)
+        # print("Initializing VAO #", vao, "for geometry:", self.name)
         
         # all the following vertex bindings will be stored in this VAO
         glBindVertexArray(vao)

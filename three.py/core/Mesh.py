@@ -23,46 +23,6 @@ class Mesh(Object3D):
         vao = self.geometry.getVAO(shaderProgramID)
         glBindVertexArray(vao)
         
-        """
-        # set up attribute pointers
-        for name, data in self.geometry.attributeData.items():
-
-            # if necessary, obtain an available buffer reference
-            if data["bufferID"] is None:
-                # return an available (unused) reference value
-                data["bufferID"] = glGenBuffers(1)
-                
-            # if necessary, buffer data to GPU
-            if data["needsUpdate"] is True:
-                # make current bufferID active
-                glBindBuffer(GL_ARRAY_BUFFER, data["bufferID"])
-                # convert to a numpy array
-                array = np.array( data["value"] ).astype( np.float32 )
-                # create empty buffer object if necessary,
-                # and send data to the active buffer
-                glBufferData(GL_ARRAY_BUFFER, array.ravel(), GL_STATIC_DRAW)
-                # all done!
-                data["needsUpdate"] = False
-
-            # make current bufferID active
-            glBindBuffer(GL_ARRAY_BUFFER, data["bufferID"])
-
-            attributeVarID = glGetAttribLocation(shaderProgramID, data["name"])
-            # check if this variable exists in shader program; if so, point it to currently bound bufferID.
-            if (attributeVarID != -1):
-                glEnableVertexAttribArray(attributeVarID)
-                if data["type"] == "float":
-                    glVertexAttribPointer(attributeVarID, 1, GL_FLOAT, False, 0, None)
-                elif data["type"] == "vec2":
-                    glVertexAttribPointer(attributeVarID, 2, GL_FLOAT, False, 0, None)
-                elif data["type"] == "vec3":
-                    glVertexAttribPointer(attributeVarID, 3, GL_FLOAT, False, 0, None)
-                elif data["type"] == "vec4":
-                    glVertexAttribPointer(attributeVarID, 4, GL_FLOAT, False, 0, None)
-                else:
-                    raise Exception("Attribute " + data['name'] + " has unknown type " + data['type'])
-        """
-        
         # update uniform matrix data (transform = modelMatrix)        
         modelMatrixVarID = glGetUniformLocation(shaderProgramID, "modelMatrix")
         glUniformMatrix4fv(modelMatrixVarID, 1, GL_TRUE, self.getWorldMatrix() )

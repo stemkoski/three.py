@@ -90,7 +90,7 @@ class LineBasicMaterial(Material):
         # set default uniform values
         self.setUniform( "vec3", "color", color )
         self.setUniform( "float", "alpha", alpha )
-        print("line basic material - use colors", useVertexColors)
+
         if useVertexColors:
             self.setUniform( "bool", "useVertexColors", 1 )
         else:
