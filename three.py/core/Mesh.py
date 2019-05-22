@@ -1,7 +1,7 @@
 import numpy as np
 from OpenGL.GL import *
 
-from core import Object3D
+from core import Object3D, Uniform
 
 class Mesh(Object3D):
 
@@ -10,7 +10,10 @@ class Mesh(Object3D):
         self.geometry = geometry
         self.material = material
         self.visible = True
-         
+        
+        self.uniformList = {}
+        self.uniformList["modelMatrix"] = Uniform("mat4", "modelMatrix", self.transform)
+
     # passing shaderProgramID as a parameter because
     #   usually Mesh will render with it's own Material's shader
     #   but when doing shadow passes, uses a different shader
@@ -19,15 +22,17 @@ class Mesh(Object3D):
         if not self.visible:
             return
 
-         # automatically activate vertex bindings stored in associated VAO
+        # automatically activate vertex bindings stored in associated VAO
         vao = self.geometry.getVAO(shaderProgramID)
         glBindVertexArray(vao)
-        
-        # update uniform matrix data (transform = modelMatrix)        
-        modelMatrixVarID = glGetUniformLocation(shaderProgramID, "modelMatrix")
-        glUniformMatrix4fv(modelMatrixVarID, 1, GL_TRUE, self.getWorldMatrix() )
-                
-        # update uniform material data
+
+        # update mesh uniform data here, 
+        #   otherwise this code is repeated for shadow pass and standard pass in renderer class
+        self.uniformList["modelMatrix"].value = self.getWorldMatrix()
+        for uniform in self.uniformList.values():
+            uniform.update( shaderProgramID )
+
+        # update material uniform data
         # textureNumber starts at 1 because slot 0 reserved for shadow map (if any)
         textureNumber = 1
         for uniform in self.material.uniformList.values():
@@ -38,6 +43,7 @@ class Mesh(Object3D):
                 textureNumber += 1
             uniform.update( shaderProgramID )
 
+        # -------------------------------------------------------------------
         # set render parameters
         glPointSize(self.material.pointSize)
         glLineWidth(self.material.lineWidth)
@@ -63,5 +69,6 @@ class Mesh(Object3D):
             # normal blending
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         
+        # -------------------------------------------------------------------
         glDrawArrays(self.material.drawStyle, 0, self.geometry.vertexCount)
         

@@ -9,6 +9,10 @@ class Camera(Object3D):
         self.projectionMatrix = MatrixFactory.makeIdentity()
         self.viewMatrix = MatrixFactory.makeIdentity()
         
+        self.uniformList = {}
+        self.uniformList["projectionMatrix"] = Uniform("mat4", "projectionMatrix", self.projectionMatrix)
+        self.uniformList["viewMatrix"]       = Uniform("mat4", "viewMatrix", self.viewMatrix)
+
     def getProjectionMatrix(self):
         return self.projectionMatrix
         

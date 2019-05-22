@@ -55,7 +55,7 @@ class Renderer(object):
         
     def render(self, scene, camera, renderTarget=None, clearColor=True, clearDepth=True):
 
-        # shadow rendering pass
+        # shadow rendering pass -------------------------------------------
         if self.shadowMapEnabled:
             
             # render objects in meshList from light's shadowCamera onto light's shadowMap
@@ -83,17 +83,16 @@ class Renderer(object):
                 # reduce number of matrix inversions to improve performance
                 light.shadowCamera.updateViewMatrix()
                 
-                glUniformMatrix4fv( glGetUniformLocation(shadowProgramID, "projectionMatrix"), 
-                    1, GL_TRUE, light.shadowCamera.getProjectionMatrix() )
-                
-                glUniformMatrix4fv(glGetUniformLocation(shadowProgramID, "viewMatrix"), 
-                    1, GL_TRUE, light.shadowCamera.getViewMatrix() )
-                
+                light.shadowCamera.uniformList["projectionMatrix"].value = light.shadowCamera.getProjectionMatrix()
+                light.shadowCamera.uniformList[      "viewMatrix"].value = light.shadowCamera.getViewMatrix()            
+                for uniform in light.shadowCamera.uniformList.values():
+                    uniform.update( shadowProgramID )
+
                 for mesh in shadowCastMeshList:
                     mesh.render( shaderProgramID = shadowProgramID )
+ 
                     
-                    
-        # standard rendering pass
+        # standard rendering pass -------------------------------------------
         glClearColor(self.clearColor[0], self.clearColor[1], self.clearColor[2], 1)
         
         # activate render target
@@ -119,36 +118,28 @@ class Renderer(object):
         # reduce number of matrix inversions (to improve performance)
         camera.updateViewMatrix()
         
-        for mesh in meshList: # scene.children:
+        for mesh in meshList:
 
             # activate correct shader program
             ID = mesh.material.shaderProgramID
             glUseProgram( ID ) 
            
-            # update projection and view matrix uniforms
-            projectionMatrixVarID = glGetUniformLocation(ID, "projectionMatrix")
-            if projectionMatrixVarID != -1:
-                glUniformMatrix4fv(projectionMatrixVarID, 1, GL_TRUE, camera.getProjectionMatrix() )
-                
-            viewMatrixVarID = glGetUniformLocation(ID, "viewMatrix")
-            if viewMatrixVarID != -1:
-                glUniformMatrix4fv(viewMatrixVarID, 1, GL_TRUE, camera.getViewMatrix() )
-
             if self.fog is not None:
                for uniform in self.fog.uniformList.values():
                     uniform.update( ID )
-            """
-            if self.fogEnabled:
-                glUniform1i(glGetUniformLocation(ID, "useFog"), 1)
-                glUniform1f(glGetUniformLocation(ID, "fogStartDistance"), self.fog.startDistance)
-                glUniform1f(glGetUniformLocation(ID, "fogEndDistance"), self.fog.endDistance)
-                glUniform3f(glGetUniformLocation(ID, "fogColor"), self.fog.color[0], self.fog.color[1], self.fog.color[2])
-            """
 
+            # in case uniform values may have changed, update value first
+            camera.uniformList["projectionMatrix"].value = camera.getProjectionMatrix()
+            camera.uniformList[      "viewMatrix"].value = camera.getViewMatrix()            
+            for uniform in camera.uniformList.values():
+                uniform.update( ID )
+
+            # TODO: move this to Mesh uniformList
             receiveShadowVarID = glGetUniformLocation(ID, "receiveShadow")
             if receiveShadowVarID != -1 and mesh.receiveShadow:
                 glUniform1i( receiveShadowVarID, 1 )
-                    
+            
+            # TODO: store light data in Uniform objects also
             # update light data
             lightCount = len(lightList)            
             glUniform1i( glGetUniformLocation(ID, "lightCount"), lightCount )
