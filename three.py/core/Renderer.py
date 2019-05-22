@@ -135,14 +135,16 @@ class Renderer(object):
                 uniform.update( ID )
 
             # TODO: move this to Mesh uniformList
-            receiveShadowVarID = glGetUniformLocation(ID, "receiveShadow")
-            if receiveShadowVarID != -1 and mesh.receiveShadow:
-                glUniform1i( receiveShadowVarID, 1 )
-            
+            if mesh.receiveShadow:
+                receiveShadowVarID = glGetUniformLocation(ID, "receiveShadow")
+                if receiveShadowVarID != -1:
+                    glUniform1i( receiveShadowVarID, 1 )
+                
             # TODO: store light data in Uniform objects also
             # update light data
-            lightCount = len(lightList)            
-            glUniform1i( glGetUniformLocation(ID, "lightCount"), lightCount )
+            lightCount = len(lightList)
+            if lightCount > 0:
+                glUniform1i( glGetUniformLocation(ID, "lightCount"), lightCount )
 
             # update data for all the lights
             lightIndex = 0
