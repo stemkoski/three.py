@@ -80,6 +80,9 @@ class Renderer(object):
                 shadowProgramID = light.shadowMaterial.shaderProgramID
                 glUseProgram( shadowProgramID )
                 
+                # reduce number of matrix inversions to improve performance
+                light.shadowCamera.updateViewMatrix()
+                
                 glUniformMatrix4fv( glGetUniformLocation(shadowProgramID, "projectionMatrix"), 
                     1, GL_TRUE, light.shadowCamera.getProjectionMatrix() )
                 
@@ -115,6 +118,9 @@ class Renderer(object):
          
         meshList = scene.getObjectsByFilter( lambda x : isinstance(x, Mesh) )
         lightList = scene.getObjectsByFilter( lambda x : isinstance(x, Light) )
+        
+        # reduce number of matrix inversions (to improve performance)
+        camera.updateViewMatrix()
         
         for mesh in meshList: # scene.children:
 

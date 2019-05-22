@@ -34,7 +34,7 @@ class TestFog(Base):
         boxTexture = OpenGLUtils.initializeTexture("images/color-grid.png")
         boxMat = SurfaceBasicMaterial(texture=boxTexture)
 
-        for i in range(30):            
+        for i in range(100):            
             box = Mesh(boxGeo, boxMat)
             box.transform.setPosition(
                 random.uniform(-5,5),random.uniform(0,5),random.uniform(4,-10))
