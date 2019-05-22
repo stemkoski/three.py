@@ -267,11 +267,11 @@ class ParticleEngine(Mesh):
                 self.particleGeometry.attributeData["particleAlive"]["value"][particle.index] = particle.alive
         
         # flag geometry attributes so updated data is resent to buffers
-        self.particleGeometry.attributeData["particlePosition"]["needsUpdate"] = True
-        self.particleGeometry.attributeData["particleColor"]["needsUpdate"] = True
-        self.particleGeometry.attributeData["particleOpacity"]["needsUpdate"] = True
-        self.particleGeometry.attributeData["particleSize"]["needsUpdate"] = True
-        self.particleGeometry.attributeData["particleAlive"]["needsUpdate"] = True
+        self.particleGeometry.processAttribute("particlePosition") 
+        self.particleGeometry.processAttribute("particleColor")
+        self.particleGeometry.processAttribute("particleOpacity")
+        self.particleGeometry.processAttribute("particleSize")
+        self.particleGeometry.processAttribute("particleAlive")
         
 
         # check if particle emitter is still running

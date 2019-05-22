@@ -19,6 +19,11 @@ class Mesh(Object3D):
         if not self.visible:
             return
 
+         # automatically activate vertex bindings stored in associated VAO
+        vao = self.geometry.getVAO(shaderProgramID)
+        glBindVertexArray(vao)
+        
+        """
         # set up attribute pointers
         for name, data in self.geometry.attributeData.items():
 
@@ -56,7 +61,8 @@ class Mesh(Object3D):
                     glVertexAttribPointer(attributeVarID, 4, GL_FLOAT, False, 0, None)
                 else:
                     raise Exception("Attribute " + data['name'] + " has unknown type " + data['type'])
-
+        """
+        
         # update uniform matrix data (transform = modelMatrix)        
         modelMatrixVarID = glGetUniformLocation(shaderProgramID, "modelMatrix")
         glUniformMatrix4fv(modelMatrixVarID, 1, GL_TRUE, self.getWorldMatrix() )
