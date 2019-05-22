@@ -28,41 +28,17 @@ class Mesh(Object3D):
         glUniformMatrix4fv(modelMatrixVarID, 1, GL_TRUE, self.getWorldMatrix() )
                 
         # update uniform material data
-        # textureNumber starts at 1 because slot 0 will be reserved for shadow map (if any)
-        textureNumber = 1         
-        for name, data in self.material.uniformData.items():
+        # textureNumber starts at 1 because slot 0 reserved for shadow map (if any)
+        textureNumber = 1
+        for uniform in self.material.uniformList.values():
+            if uniform.type == "sampler2D":
+                # used to activate a particular texture slot
+                uniform.textureNumber = textureNumber
+                # increment textureNumber in case additional textures are in use
+                textureNumber += 1
+            uniform.update( shaderProgramID )
 
-            uniformVarID = glGetUniformLocation(shaderProgramID, data["name"])
-            
-            if (uniformVarID != -1):
-                if data["type"] == "bool":
-                    glUniform1i(uniformVarID, data["value"])
-                elif data["type"] == "float":
-                    glUniform1f(uniformVarID, data["value"])
-                elif data["type"] == "vec2":
-                    glUniform2f(uniformVarID, data["value"][0], data["value"][1])
-                elif data["type"] == "vec3":
-                    glUniform3f(uniformVarID, data["value"][0], data["value"][1], data["value"][2])
-                elif data["type"] == "vec4":
-                    glUniform4f(uniformVarID, data["value"][0], data["value"][1], data["value"][2], data["value"][3])
-                elif data["type"] == "sampler2D":
-                    # var <-> slot <-> buffer/ref/ID
-                    # point uniform to get data from specific texture slot
-                    glUniform1i(uniformVarID, textureNumber)
-                    # activate texture slot
-                    glActiveTexture( GL_TEXTURE0 + textureNumber )
-                    # associate texture data reference to currently active texture "slot" (usually 0 through 15)
-                    glBindTexture( GL_TEXTURE_2D, data["value"] )
-                    # when rendering normal textures, set coordinates to repeat
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-                    # increment textureNumber in case additional textures are in use
-                    textureNumber += 1
-                
-                else:
-                    raise Exception("Uniform " + data['name'] + " has unknown type " + data['type'])
-
-        # render settings
+        # set render parameters
         glPointSize(self.material.pointSize)
         glLineWidth(self.material.lineWidth)
         
