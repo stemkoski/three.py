@@ -3,7 +3,7 @@ from geometry import *
 from material import *
 from mathutils import *
 
-from random import random, uniform
+import random as rand
 from math import sin, cos, pi, sqrt
 
 # =============================================================================
@@ -205,7 +205,7 @@ class ParticleEngine(Mesh):
         elif self.style == "sphere":
             ux,uy,uz = RandomUtils.randomUnitSphereVec3()
             cx,cy,cz = self.positionBase
-            r = uniform(0, self.positionSpread)
+            r = rand.uniform(0, self.positionSpread)
             particle.position = [cx+r*ux, cy+r*uy, cz+r*uz]               
             s = RandomUtils.randomFloat(self.velocityBase, self.velocitySpread)
             particle.velocity = [s*ux, s*uy, s*uz]
@@ -267,11 +267,11 @@ class ParticleEngine(Mesh):
                 self.particleGeometry.attributeData["particleAlive"]["value"][particle.index] = particle.alive
         
         # flag geometry attributes so updated data is resent to buffers
-        self.particleGeometry.attributeData["particlePosition"]["needsUpdate"] = True
-        self.particleGeometry.attributeData["particleColor"]["needsUpdate"] = True
-        self.particleGeometry.attributeData["particleOpacity"]["needsUpdate"] = True
-        self.particleGeometry.attributeData["particleSize"]["needsUpdate"] = True
-        self.particleGeometry.attributeData["particleAlive"]["needsUpdate"] = True
+        self.particleGeometry.processAttribute("particlePosition") 
+        self.particleGeometry.processAttribute("particleColor")
+        self.particleGeometry.processAttribute("particleOpacity")
+        self.particleGeometry.processAttribute("particleSize")
+        self.particleGeometry.processAttribute("particleAlive")
         
 
         # check if particle emitter is still running

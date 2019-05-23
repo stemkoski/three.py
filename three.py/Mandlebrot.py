@@ -7,7 +7,6 @@ from material import *
 from helpers import *
 from mathutils import *
 
-# TODO: adjust for non-square window sizes
 class TestMandlebrot(Base):
     
     def initialize(self):
@@ -111,50 +110,50 @@ class TestMandlebrot(Base):
             pygame.image.save(self.screen, fileName)
             print("Image saved to: " + fileName)
 
-        uniformData = self.mesh.material.uniformData
+        uniformData = self.mesh.material.uniformList
         
         # move around
-        moveAmountX, moveAmountY = uniformData["viewportSize"]["value"]
+        moveAmountX, moveAmountY = uniformData["viewportSize"].value
         scrollSpeed = 0.005
         moveAmountX *= scrollSpeed
         moveAmountY *= scrollSpeed
         if self.input.isKeyPressed(pygame.K_a):
-            uniformData["center"]["value"][0] -= moveAmountX
+            uniformData["center"].value[0] -= moveAmountX
         if self.input.isKeyPressed(pygame.K_d):
-            uniformData["center"]["value"][0] += moveAmountX
+            uniformData["center"].value[0] += moveAmountX
         if self.input.isKeyPressed(pygame.K_w):
-            uniformData["center"]["value"][1] += moveAmountY
+            uniformData["center"].value[1] += moveAmountY
         if self.input.isKeyPressed(pygame.K_s):
-            uniformData["center"]["value"][1] -= moveAmountY
+            uniformData["center"].value[1] -= moveAmountY
 
         # zoom in/out
         zoomAmount = 1.01
         if self.input.isKeyPressed(pygame.K_i):
-            uniformData["viewportSize"]["value"][0] /= zoomAmount
-            uniformData["viewportSize"]["value"][1] /= zoomAmount
+            uniformData["viewportSize"].value[0] /= zoomAmount
+            uniformData["viewportSize"].value[1] /= zoomAmount
         if self.input.isKeyPressed(pygame.K_o):
-            uniformData["viewportSize"]["value"][0] *= zoomAmount
-            uniformData["viewportSize"]["value"][1] *= zoomAmount
+            uniformData["viewportSize"].value[0] *= zoomAmount
+            uniformData["viewportSize"].value[1] *= zoomAmount
 
         # increment time variable (activates color shift)
         if self.input.isKeyPressed(pygame.K_c):
-            uniformData["time"]["value"] += 0.001
+            uniformData["time"].value += 0.001
             
         # reset to default view
         if self.input.isKeyDown(pygame.K_r):
-            uniformData["center"]["value"] = [-0.5, 0]
-            uniformData["viewportSize"]["value"] = [4,4]
-            uniformData["time"]["value"] = 0
+            uniformData["center"].value = [-0.5, 0]
+            uniformData["viewportSize"].value = [4,4]
+            uniformData["time"].value = 0
 
         # center on mouse position (press mouse button)
         if self.input.isMouseDown():
-            screenSize = uniformData["screenSize"]["value"]
+            screenSize = uniformData["screenSize"].value
             mouseX, mouseY = self.input.getMousePosition()
             percentX = mouseX / screenSize[0]
             # account for inverted Y-axis
             percentY = (1 - mouseY / screenSize[1])
-            center = uniformData["center"]["value"]
-            viewportSize = uniformData["viewportSize"]["value"]
+            center = uniformData["center"].value
+            viewportSize = uniformData["viewportSize"].value
             targetX = center[0] + (percentX - 0.5) * viewportSize[0]
             targetY = center[1] + (percentY - 0.5) * viewportSize[1]
             self.recenter = True
@@ -164,14 +163,14 @@ class TestMandlebrot(Base):
 
         if self.recenter:
             self.moveTimer += self.deltaTime
-            uniformData["center"]["value"] = self.moveTween.evaluate(self.moveTimer)
+            uniformData["center"].value = self.moveTween.evaluate(self.moveTimer)
             if self.moveTimer >= 1:
                 self.recenter = False
  
         # print window coordinates
         if self.input.isKeyDown(pygame.K_p):
-            center = uniformData["center"]["value"]
-            viewportSize = uniformData["viewportSize"]["value"]
+            center = uniformData["center"].value
+            viewportSize = uniformData["viewportSize"].value
             xMin = "{:.8f}".format( center[0] - viewportSize[0] )
             xMax = "{:.8f}".format( center[0] + viewportSize[0] )
             yMin = "{:.8f}".format( center[1] - viewportSize[1] )
@@ -184,10 +183,10 @@ class TestMandlebrot(Base):
         if self.input.resize():
             newSize = self.input.getWindowSize()
             self.renderer.setViewportSize(newSize["width"], newSize["height"])
-            oldSize = uniformData["screenSize"]["value"]
-            uniformData["viewportSize"]["value"][0] *= newSize["width"] / oldSize[0]
-            uniformData["viewportSize"]["value"][1] *= newSize["height"] / oldSize[1]
-            uniformData["screenSize"]["value"] = [ newSize["width"], newSize["height"] ]
+            oldSize = uniformData["screenSize"].value
+            uniformData["viewportSize"].value[0] *= newSize["width"] / oldSize[0]
+            uniformData["viewportSize"].value[1] *= newSize["height"] / oldSize[1]
+            uniformData["screenSize"].value = [ newSize["width"], newSize["height"] ]
 
         self.renderer.render(self.scene, self.camera)
                     

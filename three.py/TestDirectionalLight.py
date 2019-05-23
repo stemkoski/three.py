@@ -14,7 +14,7 @@ class TestDirectionalLight(Base):
 
         self.renderer = Renderer()
         self.renderer.setViewportSize(800,800)
-        self.renderer.setClearColor(0.25,0.25,0.25)
+        self.renderer.setClearColor(0.25,0.25,0.75)
         
         self.scene = Scene()
         
@@ -26,9 +26,9 @@ class TestDirectionalLight(Base):
         ambientLight = AmbientLight(color=[0.1,0.1,0.2])
         self.scene.add( ambientLight )
         
-        directionalLight = DirectionalLight(position=[4,4,-2], direction=[-1,-1,-1])
-        self.scene.add( directionalLight )
-        self.scene.add( DirectionalLightHelper(directionalLight) )
+        self.directionalLight = DirectionalLight(position=[2,3,0], direction=[-1,-1,0])
+        self.scene.add( self.directionalLight )
+        self.scene.add( DirectionalLightHelper(self.directionalLight) )
         
         gridTexture  = OpenGLUtils.initializeTexture("images/color-grid.png")
         lightMaterial = SurfaceLightMaterial( color=[1,1,1], texture=gridTexture );
@@ -54,6 +54,8 @@ class TestDirectionalLight(Base):
         self.cube.transform.rotateY(0.03, Matrix.LOCAL)
 
         self.sphere.transform.rotateY(0.025, Matrix.LOCAL)
+
+        self.directionalLight.transform.rotateZ(0.002, Matrix.LOCAL)
         
         self.renderer.render(self.scene, self.camera)
                     

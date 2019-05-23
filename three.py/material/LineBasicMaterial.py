@@ -3,7 +3,7 @@ from material import *
 
 class LineBasicMaterial(Material):
         
-    def __init__(self, color=[0,0,0], alpha=1, lineWidth=4, useVertexColors=False):
+    def __init__(self, color=[1,1,1], alpha=1, lineWidth=4, useVertexColors=False):
 
         # vertex shader code
         vsCode = """
@@ -17,12 +17,21 @@ class LineBasicMaterial(Material):
 
         uniform mat4 projectionMatrix;
         uniform mat4 viewMatrix;
-        uniform mat4 modelMatrix;        
+        uniform mat4 modelMatrix;      
+
+        uniform bool useFog;
+        out float cameraDistance;
+        
         void main()
         {
             arcLength = vertexArcLength;
             vColor = vertexColor;
             gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
+            
+            if (useFog)
+            {
+                cameraDistance = gl_Position.w;
+            }
         }
         """
 
@@ -40,6 +49,13 @@ class LineBasicMaterial(Material):
         uniform float gapLength;
         in float arcLength;
         
+        // parameters for fog calculations
+        uniform bool useFog;
+        uniform vec3 fogColor;
+        uniform float fogStartDistance;
+        uniform float fogEndDistance;
+        in float cameraDistance;
+        
         void main()
         {                
             if ( useDashes )
@@ -49,11 +65,18 @@ class LineBasicMaterial(Material):
                     discard;
             }
 
-            if ( useVertexColors )
-                gl_FragColor = vec4(vColor, alpha);
-            else
-                gl_FragColor = vec4(color, alpha);
+            vec4 baseColor = vec4(color, alpha);
             
+            if ( useVertexColors )
+                baseColor *= vec4( vColor, 1.0 );
+                
+            if ( useFog )
+            {
+                float fogFactor = clamp( (fogEndDistance - cameraDistance)/(fogEndDistance - fogStartDistance), 0.0, 1.0 );
+                baseColor = mix( vec4(fogColor,1.0), baseColor, fogFactor );
+            }
+            
+            gl_FragColor = baseColor;
         }
         """
 
@@ -67,7 +90,7 @@ class LineBasicMaterial(Material):
         # set default uniform values
         self.setUniform( "vec3", "color", color )
         self.setUniform( "float", "alpha", alpha )
-        
+
         if useVertexColors:
             self.setUniform( "bool", "useVertexColors", 1 )
         else:

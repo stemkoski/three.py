@@ -1,13 +1,17 @@
 from OpenGL.GL import *
-from core import OpenGLUtils
+from core import OpenGLUtils, Uniform
 
 class Material(object):
 
-    def __init__(self, vertexShaderCode, fragmentShaderCode, uniforms=None):
+    def __init__(self, vertexShaderCode, fragmentShaderCode, uniforms=None, name="Material"):
 
         self.shaderProgramID = OpenGLUtils.initializeShaderFromCode(vertexShaderCode, fragmentShaderCode)
-        
-        self.uniformData = {}
+        self.name = name
+
+        # DEBUG
+        # print("Initializing Shader Program #", self.shaderProgramID, "for material:", self.name)
+
+        self.uniformList = {}
         
         # options: GL_POINTS, GL_LINE_STRIP, GL_LINE_LOOP, GL_TRIANGLES
         self.drawStyle = GL_TRIANGLES
@@ -31,9 +35,8 @@ class Material(object):
             for uniform in uniforms:
                 self.setUniform(uniform[0], uniform[1], uniform[2])
             
-    # name: name of attribute variable in shader
+    # type:  float, vec2, vec3, vec4, bool(0 or 1), sampler2D, mat4
+    # name:  name of attribute variable in shader
     # value: array of values
-    # type: float, vec2, vec3, vec4, bool(0 or 1), sampler2D
     def setUniform(self, type, name, value):
-        data = { "type": type, "name": name, "value": value }
-        self.uniformData[name] = data
+        self.uniformList[name] = Uniform(type, name, value)

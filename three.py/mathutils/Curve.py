@@ -142,8 +142,8 @@ class Curve(object):
                 rotationMatrix = MatrixFactory.makeRotationAxisAngle(crossProduct,theta)
                 
                 # apply this transformation to the normal vector
-                normal = self.applyMatrix4(normal, rotationMatrix)
-
+                normal = list( rotationMatrix[0:3,0:3] @ normal )
+                
             # assign next normal vector
             normals.append(normal)
         
@@ -156,11 +156,3 @@ class Curve(object):
         return { "tangents" : tangents, "normals" : normals, "binormals" : binormals }
 
     
-    @staticmethod
-    def applyMatrix4(vec, mat):
-        vec = list( vec )       # convert back to list
-        vec.append(1)           # convert vec3 to homogeneous vec4
-        vec = list( mat @ vec ) # apply transformation
-        vec.pop(3)              # convert vec4 back to vec3
-        return vec
-        

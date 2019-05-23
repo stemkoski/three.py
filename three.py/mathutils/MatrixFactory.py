@@ -105,8 +105,15 @@ class MatrixFactory(object):
         
         forward = np.subtract(target, position)
         forward = np.divide( forward, np.linalg.norm(forward) )
-        
+
         right = np.cross( forward, up )
+        
+        # if forward and up vectors are parallel, right vector is zero; 
+        #   fix by perturbing up vector a bit
+        if np.linalg.norm(right) < 0.001:
+            epsilon = np.array( [0.001, 0, 0] )
+            right = np.cross( forward, up + epsilon )
+            
         right = np.divide( right, np.linalg.norm(right) )
         
         up = np.cross( right, forward )

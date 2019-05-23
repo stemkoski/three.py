@@ -1,5 +1,5 @@
 from math import sin, cos, pi, sqrt
-import random
+import random as rand
 from core import *
 from cameras import *
 from geometry import *
@@ -35,12 +35,12 @@ class TestPointGeometry(Base):
         # generate random points on surface of sphere
         #  and random colors
         for i in range(5000):
-            z = random.uniform(-1,1)
+            z = rand.uniform(-1,1)
             r = sqrt(1 - z**2)
-            angle = random.uniform(0,2*pi)
+            angle = rand.uniform(0,2*pi)
             x = r*cos(angle)
             y = r*sin(angle)
-            s = random.uniform(0.95, 1.05)
+            s = rand.uniform(0.95, 1.05)
             point = [s*x,s*y,s*z]
             vertexPositionData.append( point )
             color = colorsys.hsv_to_rgb(i/5000,1,1)
