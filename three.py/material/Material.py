@@ -38,6 +38,7 @@ class Material(object):
         
         self.additiveBlending = False
         
+        self.linearFiltering = True
             
     # type:  float, vec2, vec3, vec4, bool(0 or 1), sampler2D, mat4
     # name:  name of attribute variable in shader
@@ -70,3 +71,10 @@ class Material(object):
         else: 
             # normal blending
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+            
+        # for textures, use linear filtering (default) or nearest filtering (pixelize)
+        if self.linearFiltering:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        else:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+            
