@@ -1,4 +1,5 @@
 from core import *
+from lights import AmbientLight, DirectionalLight
 from cameras import *
 from geometry import *
 from material import *

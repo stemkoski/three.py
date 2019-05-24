@@ -1,6 +1,6 @@
-from core import *
-from geometry import *
-from material import *
+from core import Mesh
+from geometry import LineGeometry
+from material import LineSegmentMaterial
 
 class BoxHelper(Mesh):
 

@@ -1,6 +1,7 @@
-from core import *
-from geometry import *
-from material import *
+import numpy as np
+from core import Mesh
+from geometry import LineGeometry
+from material import LineSegmentMaterial
 
 class VertexNormalHelper(Mesh):
 

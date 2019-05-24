@@ -1,6 +1,6 @@
-from core import *
-from geometry import *
-from material import *
+from core import Mesh
+from geometry import LineGeometry
+from material import LineSegmentMaterial
 import numpy as np
 
 class DirectionalLightHelper(Mesh):
@@ -10,7 +10,7 @@ class DirectionalLightHelper(Mesh):
         vertexPositionData = []
         
         if color is None:
-            color = directionalLight.color
+            color = directionalLight.uniformList.getUniformValue("color")
         vertexColorData = []
         
         # position = np.array( directionalLight.transform.getPosition() )

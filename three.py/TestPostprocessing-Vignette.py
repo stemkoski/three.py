@@ -25,7 +25,7 @@ class TestPostprocessing1(Base):
         self.scene.add( AmbientLight(strength=0.25) )
         self.scene.add( DirectionalLight(direction=[-1,-1,-1]) )
 
-        self.renderTarget = RenderTarget(1024,768)
+        self.renderTarget = RenderTarget.RenderTarget(1024,768)
         
         crateTexture  = OpenGLUtils.initializeTexture("images/crate.jpg")
         ballTexture  = OpenGLUtils.initializeTexture("images/basketball.png")

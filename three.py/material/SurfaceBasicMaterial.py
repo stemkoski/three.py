@@ -29,8 +29,8 @@ class SurfaceBasicMaterial(Material):
         
         // assume that at most one light casts shadows
         //   and its values have been passed in here
-        uniform mat4 shadowLightProjectionMatrix;
-        uniform mat4 shadowLightViewMatrix;
+        uniform mat4 shadowProjectionMatrix;
+        uniform mat4 shadowViewMatrix;
         out vec4 positionFromShadowLight;
         
         void main()
@@ -44,7 +44,7 @@ class SurfaceBasicMaterial(Material):
             if (receiveShadow)
             {
                 // multiply by modelMatrix works for directly overhead light
-                positionFromShadowLight = shadowLightProjectionMatrix * shadowLightViewMatrix * modelMatrix * vec4(vertexPosition, 1);
+                positionFromShadowLight = shadowProjectionMatrix * shadowViewMatrix * modelMatrix * vec4(vertexPosition, 1);
             }
             
             gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1);
@@ -85,19 +85,17 @@ class SurfaceBasicMaterial(Material):
             float strength;
             vec3 color;
             
-            // used by directional light
-            vec3 direction;
-            
             // used by point light
             vec3 position;
+
+            // used by directional light
+            vec3 direction;
         };
 
         uniform Light light0;
         uniform Light light1;
         uniform Light light2;
         uniform Light light3;
-        
-        uniform int lightCount;
         
         vec3 lightCalculation(Light light, vec3 fragPosition, vec3 fragNormal)
         {
@@ -120,11 +118,10 @@ class SurfaceBasicMaterial(Material):
                 float attenuation = 1.0;
                 return light.color * light.strength * cosAngle * attenuation;
             }
-            else
+            else // occurs if no data set for this light; bool values default to 0
             {
                 return vec3(0,0,0);
             }
-            
         }
         
         // parameters for fog calculations
@@ -157,7 +154,7 @@ class SurfaceBasicMaterial(Material):
             {
                 Light lightArray[4] = {light0, light1, light2, light3};
                 vec3 totalLight = vec3(0,0,0);
-                for (int n = 0; n < lightCount; n++)
+                for (int n = 0; n < 4; n++)
                     totalLight += lightCalculation( lightArray[n], position, normal );
                 totalLight = min( totalLight, vec3(1,1,1) );
                 baseColor *= vec4( totalLight, 1 );

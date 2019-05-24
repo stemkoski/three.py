@@ -1,8 +1,10 @@
-from core import *
-from cameras import *
-from geometry import *
-from material import *
-from helpers import *
+from core import Base, Renderer, Scene, RenderTarget, Mesh, FirstPersonController, OpenGLUtils
+from cameras import PerspectiveCamera
+from lights import AmbientLight, DirectionalLight
+from geometry import QuadGeometry, SphereGeometry, BoxGeometry
+from material import SurfaceBasicMaterial, SurfaceLightMaterial
+from mathutils import Matrix
+from helpers import DirectionalLightHelper, OrthographicCameraHelper
 
 class TestShadows(Base):
     
@@ -31,15 +33,14 @@ class TestShadows(Base):
         
         # setup directional light that casts shadows
         directionalLight = DirectionalLight(position=[2,2,0], direction=[-2,-1,0])
-        directionalLight.enableShadows()
-        directionalLight.shadowRenderTarget = RenderTarget(1024,1024)
-        directionalLight.shadowStrength = 0.5
+        directionalLight.enableShadows(strength=0.5)
         # the tighter the fit on the shadow region,
         #   the better the shadow resolution will be.
         # adjust as necessary according to the contents of the scene
         directionalLight.shadowCamera.setViewRegion(
             left=-2, right=2, top=2, bottom=-2, near=10, far=0)
         self.scene.add( directionalLight )
+
         self.scene.add( DirectionalLightHelper(directionalLight) )
         self.scene.add( OrthographicCameraHelper(directionalLight.shadowCamera) )
         
@@ -50,31 +51,30 @@ class TestShadows(Base):
         
         floor = Mesh( geo, SurfaceLightMaterial(texture=gridTexture) )
         floor.transform.rotateX(-3.14/2)        
-        floor.receiveShadow = True
+        floor.setReceiveShadow()
         self.scene.add( floor )
 
         # illustrate the contents of the shadowMap
         backWall = Mesh(geo,
             SurfaceBasicMaterial(texture=directionalLight.shadowRenderTarget.textureID))
         backWall.transform.translate(0,2,-2)
-        backWall.receiveShadow = False
         self.scene.add(backWall)
 
         sideWall = Mesh(geo, mat)
         sideWall.transform.translate(-2,2,0)
         sideWall.transform.rotateY(3.14/2, Matrix.LOCAL)
-        sideWall.receiveShadow = True
+        sideWall.setReceiveShadow()
         self.scene.add(sideWall)
 
         sphere = Mesh( SphereGeometry(radius=0.3), mat )
         sphere.transform.setPosition(1,2.1,0)
-        sphere.castShadow = True
+        sphere.setCastShadow()
         self.scene.add( sphere )
         
         self.box = Mesh( BoxGeometry(1,1,1), mat )
         self.box.transform.setPosition(0,1,0)
-        self.box.castShadow = True
-        self.box.receiveShadow = True
+        self.box.setCastShadow()
+        self.box.setReceiveShadow()
         self.scene.add( self.box )
 
     def update(self):

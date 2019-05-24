@@ -1,7 +1,6 @@
-from core import *
-from geometry import *
-from material import *
-import numpy as np
+from core import Mesh
+from geometry import IcosahedronGeometry
+from material import SurfaceBasicMaterial
 
 class PointLightHelper(Mesh):
 
@@ -11,7 +10,7 @@ class PointLightHelper(Mesh):
         
         # if no color specified, use the light color
         if color is None:
-            color = pointLight.color
+            color = pointLight.uniformList.getUniformValue("color")
 
         mat = SurfaceBasicMaterial(color=color, wireframe=True, lineWidth=lineWidth)
         

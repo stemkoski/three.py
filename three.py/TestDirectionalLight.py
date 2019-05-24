@@ -1,8 +1,8 @@
 from core import *
 from cameras import *
+from lights import AmbientLight, DirectionalLight
 from geometry import *
 from material import *
-from lights import *
 from helpers import *
 
 class TestDirectionalLight(Base):

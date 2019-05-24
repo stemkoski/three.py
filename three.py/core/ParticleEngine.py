@@ -1,7 +1,8 @@
-from core import *
-from geometry import *
-from material import *
-from mathutils import *
+from OpenGL.GL import *
+from core import Mesh
+from geometry import Geometry
+from material import Material
+from mathutils import RandomUtils, Tween
 
 import random as rand
 from math import sin, cos, pi, sqrt
