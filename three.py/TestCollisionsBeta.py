@@ -4,6 +4,7 @@ from geometry import *
 from material import *
 from helpers import *
 from components import *
+from lights import *
 from physics import *
 import random
 #NOTE: this test was for internal testing, for a more detailed explanation of what is going on
@@ -44,6 +45,9 @@ class TestCollisionsBeta(Base):
         self.scene.add(self.Mesh1)
         self.scene.add(self.Mesh2)
 
+        #create a plane, not attached to any object/mesh, just floating in space
+        self.plane = Plane(normal = (-1,0,0), offset = 3)
+
        
 
         
@@ -60,6 +64,9 @@ class TestCollisionsBeta(Base):
         if self.Mesh1.overlaps(self.Mesh2):
             #print('wow')
             self.Mesh1.preventOverlap(self.Mesh2)
+
+        if(self.Mesh2.componentDict["Sphere"].intersectsPlane(self.plane)):
+            print('overlapping')
 
         
         

@@ -17,15 +17,19 @@ class Sphere(Shape):
     def align(self,matrix):
         self.center = np.asarray(matrix.getPosition())
 
-    def intersectSphere(self,other):
+    def intersectsSphere(self,other):
         distance = abs(np.linalg.norm(self.center - other.center))
         addedRadius = self.radius + other.radius
         return (addedRadius >= distance)
 
+    def intersectsPlane(self, plane):
+        return (abs(plane.distanceToPoint(self.center)) <= self.radius)
+
     #returns the minimum translation vector needed to prevent an overlap
     #will move other
+    #depricated, this logic for all other components will be handled in componentMesh
     def preventOverlap(self,other):
-        if not self.intersectSphere(other):
+        if not self.intersectsSphere(other):
             return None
 
         distanceVec = other.center - self.center
