@@ -5,6 +5,7 @@ from material import *
 from helpers import *
 from components import *
 from physics import *
+from lights import *
 import random
 
 class TestCollisionDetection(Base):
