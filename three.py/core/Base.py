@@ -2,7 +2,7 @@ import pygame
 import sys
 import time
 
-from core import *
+from core import Input
 
 class Base(object):
 

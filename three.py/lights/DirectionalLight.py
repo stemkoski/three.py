@@ -1,16 +1,17 @@
 import numpy as np
-from core import *
-from cameras import *
-from geometry import *
-from material import *
+from core import Uniform, RenderTarget
+from cameras import ShadowCamera
 from lights import Light
+from material import ShadowMaterial
+from mathutils import MatrixFactory
 from math import acos
 
 class DirectionalLight(Light):
 
     def __init__(self, position=[0,1,0], color=[1,1,1], strength=1, direction=[0,-1,0]):
         super().__init__(position=position, color=color, strength=strength)
-        self.isDirectional = 1
+
+        self.uniformList.setUniformValue("isDirectional", 1)
 
         # DEFAULT vector is totally arbitrary.
         # TODO: allow direction to be parallel to DEFAULT vector as well
@@ -42,51 +43,34 @@ class DirectionalLight(Light):
             # copy rotation data into this object's transformation matrix
             self.transform.setRotationSubmatrix( rotationMatrix )
                     
-    def getDirection(self):
+    def getDirection(self): 
         rotationMatrix = self.transform.getRotationMatrix()
         return list( rotationMatrix @ self.DEFAULT )
     
-    def enableShadows(self, shadowStrength=0.5, shadowMapSize=[512,512]):
-        self.castShadow = True
+    def enableShadows(self, strength=0.5, bias=0.005, size=[1024,1024]):
+        
         # developer may need to call dirLight.shadowCamera.setViewRegion
         #   to configure size according to scene dimensions
-        self.shadowCamera = OrthographicCamera(left=-2, right=2, top=2, bottom=-2, near=10, far=0)
+        self.shadowCamera = ShadowCamera(left=-2, right=2, top=2, bottom=-2, near=10, far=0)
         
+        self.shadowMaterial = ShadowMaterial()
+
         # TODO: connect shadowCamera transform directly to this directional light's transform
-        #   so that moving the light automatically moves the camera as well
+        #   so that moving the light automatically moves the shadowCamera and shadowLightDirection also
         position = self.transform.getPosition()
         self.shadowCamera.transform.setPosition( position[0], position[1], position[2] )
         direction = self.getDirection()
         lookTarget = [ position[0] + direction[0], position[1] + direction[1], position[2] + direction[2] ]
         self.shadowCamera.transform.lookAt( lookTarget[0], lookTarget[1], lookTarget[2] )
         
-        self.shadowStrength = shadowStrength
-        self.shadowBias = 0.005
-        
-        # vertex shader code
-        vsCode = """
-        in vec3 vertexPosition; 
-        uniform mat4 projectionMatrix;
-        uniform mat4 viewMatrix;
-        uniform mat4 modelMatrix;      
-        void main()
-        {
-            gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1);
-        }
-        """
-        # fragment shader code
-        fsCode = """
-        void main()
-        {
-            gl_FragColor = vec4(gl_FragCoord.z, gl_FragCoord.z, gl_FragCoord.z, 1);
-        }
-        """
-        
-        self.shadowMaterial = Material(vsCode, fsCode)
-        
-        # TODO: why can't RenderTarget be called here?
-        #  as a result, is currently set from main program
-        # self.shadowRenderTarget = RenderTarget( 1024,1024 )
-        
-        
+        self.shadowCamera.uniformList.addUniform( Uniform("float", "shadowStrength", strength) )
+        self.shadowCamera.uniformList.addUniform( Uniform("float", "shadowBias", bias) )
+        self.shadowCamera.uniformList.addUniform( Uniform("vec3", "shadowLightDirection", self.getDirection() ) )
+
+        self.shadowRenderTarget = RenderTarget.RenderTarget( size[0], size[1] )
+        self.shadowCamera.uniformList.addUniform( Uniform("sampler2D", "shadowMap", self.shadowRenderTarget.textureID ) )
+        # texture slot 0 reserved for shadow map texture
+        self.shadowCamera.uniformList.data["shadowMap"].textureNumber = 0
+
+
         

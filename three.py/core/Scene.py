@@ -1,4 +1,4 @@
-from core import *
+from core import Object3D
 
 class Scene(Object3D):
 

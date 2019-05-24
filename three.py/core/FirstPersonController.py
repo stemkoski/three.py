@@ -1,8 +1,7 @@
 import numpy as np
+import pygame
 from math import sin, cos
-
-from core import *
-
+from mathutils import Matrix
 
 class FirstPersonController(object):
 

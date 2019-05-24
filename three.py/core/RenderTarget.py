@@ -1,6 +1,6 @@
 from OpenGL.GL import *
 
-class RenderTarget(object): 
+class RenderTarget(object):
 
     def __init__(self, width=512, height=512):
 

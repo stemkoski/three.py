@@ -2,6 +2,7 @@ from math import sin, cos
 
 from core import *
 from cameras import *
+from lights import AmbientLight, DirectionalLight
 from mathutils import *
 from geometry import *
 from material import *

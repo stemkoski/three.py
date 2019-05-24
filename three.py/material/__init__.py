@@ -15,3 +15,5 @@ from material.PointBasicMaterial import *
 # sprite materials
 from material.SpriteMaterial import *
 
+# rendering shadows
+from material.ShadowMaterial import *

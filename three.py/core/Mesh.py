@@ -1,7 +1,7 @@
 import numpy as np
 from OpenGL.GL import *
 
-from core import Object3D, Uniform
+from core import Object3D, Uniform, UniformList
 
 class Mesh(Object3D):
 
@@ -10,9 +10,25 @@ class Mesh(Object3D):
         self.geometry = geometry
         self.material = material
         self.visible = True
-        
-        self.uniformList = {}
-        self.uniformList["modelMatrix"] = Uniform("mat4", "modelMatrix", self.transform)
+
+        self.uniformList = UniformList()
+        self.uniformList.addUniform( Uniform("mat4", "modelMatrix", self.transform) )
+
+        # casting shadow stored as a boolean 
+        #   because it affects if mesh is included during rendering pass where shadow map texture is generated
+        self.castShadow = False
+        # receiving shadow stored in a uniform
+        #   because it affects appearance of this object when rendered
+        self.uniformList.addUniform( Uniform("bool", "receiveShadow", 0) )
+
+    def setCastShadow(self, state=True):
+        self.castShadow = state
+
+    def setReceiveShadow(self, state=True):
+        if state:
+            self.uniformList.setUniformValue("receiveShadow", 1)
+        else:
+            self.uniformList.setUniformValue("receiveShadow", 0)
 
     # passing shaderProgramID as a parameter because
     #   usually Mesh will render with it's own Material's shader
@@ -28,9 +44,8 @@ class Mesh(Object3D):
 
         # update mesh uniform data here, 
         #   otherwise this code is repeated for shadow pass and standard pass in renderer class
-        self.uniformList["modelMatrix"].value = self.getWorldMatrix()
-        for uniform in self.uniformList.values():
-            uniform.update( shaderProgramID )
+        self.uniformList.setUniformValue( "modelMatrix", self.getWorldMatrix() )
+        self.uniformList.update( shaderProgramID )
 
         # update material uniform data
         # textureNumber starts at 1 because slot 0 reserved for shadow map (if any)
@@ -43,32 +58,9 @@ class Mesh(Object3D):
                 textureNumber += 1
             uniform.update( shaderProgramID )
 
-        # -------------------------------------------------------------------
-        # set render parameters
-        glPointSize(self.material.pointSize)
-        glLineWidth(self.material.lineWidth)
-        
-        # enable meshes to cull front or back faces
-        if self.material.renderFront and self.material.renderBack:
-            glDisable(GL_CULL_FACE)
-        else:
-            glEnable(GL_CULL_FACE)
-            if not self.material.renderFront:
-                glCullFace(GL_FRONT)
-            if not self.material.renderBack:
-                glCullFace(GL_BACK)
-        
-        # apply the fill style to both front and back
-        glPolygonMode(GL_FRONT_AND_BACK, self.material.fillStyle)        
-        
-        # use additive blending or normal blending (default)
-        if self.material.additiveBlending:
-            # additive
-            glBlendFunc(GL_ONE, GL_ONE)
-        else: 
-            # normal blending
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        
-        # -------------------------------------------------------------------
+        # update material render settings
+        self.material.updateRenderSettings()
+      
+        # draw the mesh
         glDrawArrays(self.material.drawStyle, 0, self.geometry.vertexCount)
         

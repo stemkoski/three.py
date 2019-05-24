@@ -2,7 +2,6 @@ import numpy as np
 from OpenGL.GL import *
  
 from mathutils import Matrix
-from core import *
 
 class Object3D(object):
 
@@ -11,8 +10,6 @@ class Object3D(object):
         self.parent = None
         self.children = []
         self.name = ""
-        self.castShadow = False
-        self.receiveShadow = False
     
     def add(self, child):
         self.children.append(child)

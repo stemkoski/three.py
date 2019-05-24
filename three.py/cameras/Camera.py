@@ -1,5 +1,5 @@
 import numpy as np
-from core import *
+from core import Object3D, Uniform, UniformList
 from mathutils import MatrixFactory
 
 class Camera(Object3D):
@@ -9,9 +9,9 @@ class Camera(Object3D):
         self.projectionMatrix = MatrixFactory.makeIdentity()
         self.viewMatrix = MatrixFactory.makeIdentity()
         
-        self.uniformList = {}
-        self.uniformList["projectionMatrix"] = Uniform("mat4", "projectionMatrix", self.projectionMatrix)
-        self.uniformList["viewMatrix"]       = Uniform("mat4", "viewMatrix", self.viewMatrix)
+        self.uniformList = UniformList()
+        self.uniformList.addUniform( Uniform("mat4", "projectionMatrix", self.projectionMatrix) )
+        self.uniformList.addUniform( Uniform("mat4", "viewMatrix", self.viewMatrix) )
 
     def getProjectionMatrix(self):
         return self.projectionMatrix

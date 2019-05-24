@@ -22,7 +22,7 @@ class TestPostprocessing2(Base):
         self.camera.transform.setPosition(0, 0, 6)
         self.cameraControls = FirstPersonController(self.input, self.camera)
 
-        self.renderTarget = RenderTarget(1024,768)
+        self.renderTarget = RenderTarget.RenderTarget(1024,768)
         
         crateTexture  = OpenGLUtils.initializeTexture("images/crate.jpg")
         ballTexture  = OpenGLUtils.initializeTexture("images/basketball.png")
