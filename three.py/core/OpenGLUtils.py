@@ -82,11 +82,20 @@ class OpenGLUtils(object):
         # generate a mipmap for use with 2d textures
         glGenerateMipmap(GL_TEXTURE_2D)
         
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-        #use the mip map filter rather than standard filter
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
-        # useless - glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE)
+        # default: use smooth interpolated color sampling when textures magnified
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        # use the mip map filter rather than standard filter
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
+        
         return texid
 
+    @staticmethod
+    def updateSurface(surface, textureID):
+        textureData = pygame.image.tostring(surface, "RGBA", 1)
+        width = surface.get_width()
+        height = surface.get_height() 
+        glBindTexture(GL_TEXTURE_2D, textureID)
+        # send image data to texture buffer
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
+                     0, GL_RGBA, GL_UNSIGNED_BYTE, textureData)
+                     
