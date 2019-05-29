@@ -26,3 +26,4 @@ from geometry.CircleGeometry import *
 from geometry.PolygonGeometry import *
 
 from geometry.OBJGeometry import *
+from geometry.OBJExtruder import *
