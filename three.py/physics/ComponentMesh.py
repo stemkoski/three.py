@@ -17,7 +17,7 @@ class ComponentMesh(Mesh):
         if "Sphere" not in self.componentDict.keys():
             return False
         
-        overlaps = (self.componentDict["Sphere"].intersectsSphere(other.componentDict["Sphere"]))
+        overlaps = (self.componentDict["Sphere"].intersectSphere(other.componentDict["Sphere"]))
         return overlaps
 
     #TODO: prevent overlap with more types of components
