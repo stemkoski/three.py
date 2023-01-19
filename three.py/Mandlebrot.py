@@ -54,7 +54,7 @@ class TestMandlebrot(Base):
             float power = 0.3;
                 
             int i;
-            int maxiter = 512;
+            int maxiter = 100;
             for(i=0; i<maxiter; i++) 
             {
                 float x = (z.x * z.x - z.y * z.y) + c.x;
